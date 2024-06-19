@@ -11,19 +11,19 @@ interface ISiteMetadataResult {
 }
 
 const data: ISiteMetadataResult = {
-  siteTitle: 'Workouts Map',
-  siteUrl: 'https://ben29.xyz',
-  logo: 'https://avatars3.githubusercontent.com/u/6956444?s=460&u=97e1062227c4088db3c987146455245c6fa78441',
-  description: 'Personal site and blog',
+  siteTitle: "Hong's Workouts Map",
+  siteUrl: 'https://yeweihong.github.io/workoutspage',
+  logo: 'https://avatars.githubusercontent.com/u/49354927?v=4',
+  description: 'Personal site and photo',
   keywords: 'workouts, running, cycling, riding, roadtrip, hiking, swimming',
   navLinks: [
     {
-      name: 'Blog',
-      url: 'https://ben29.xyz',
+      name: 'Weibo',
+      url: 'https://weibo.com/u/7827405869',
     },
     {
-      name: 'About',
-      url: 'https://github.com/ben-29/workouts_page/blob/master/README-CN.md',
+      name: 'Photos',
+      url: 'https://500px.com.cn/sahazuber',
     },
   ],
 };
