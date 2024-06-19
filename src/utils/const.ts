@@ -13,6 +13,7 @@ const MUNICIPALITY_CITIES_ARR = [
   '澳门特别行政区',
 ];
 const MAP_LAYER_LIST = [
+  'contour-label',
   'road-label',
   'waterway-label',
   'natural-line-label',
@@ -31,7 +32,7 @@ const USE_GOOGLE_ANALYTICS = false;
 const GOOGLE_ANALYTICS_TRACKING_ID = '';
 
 // styling: set to `true` if you want dash-line route
-const USE_DASH_LINE = false;
+const USE_DASH_LINE = true;
 // styling: route line opacity: [0, 1]
 const LINE_OPACITY = 0.6;
 // styling: map height
