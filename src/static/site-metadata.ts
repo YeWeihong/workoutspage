@@ -23,7 +23,7 @@ const data: ISiteMetadataResult = {
     },
     {
       name: 'Photos',
-      url: 'https://500px.com.cn/sahazuber',
+      url: 'https://www.xiaohongshu.com/user/profile/64b923b0000000001403ce6d',
     },
   ],
 };
