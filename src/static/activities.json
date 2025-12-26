@@ -3298,5 +3298,20 @@
 "average_speed": 1.658,
 "source": "strava",
 "streak": 1
+},
+{
+"run_id": 16844456093,
+"name": "Evening Swim",
+"distance": 2100.0,
+"moving_time": "0:25:45",
+"type": "Swim",
+"start_date": "2025-12-26 12:10:38+00:00",
+"start_date_local": "2025-12-26 20:10:38",
+"location_country": null,
+"summary_polyline": "",
+"average_heartrate": 136.5,
+"average_speed": 1.359,
+"source": "strava",
+"streak": 1
 }
 ]
