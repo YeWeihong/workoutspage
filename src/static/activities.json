@@ -3313,5 +3313,20 @@
 "average_speed": 1.359,
 "source": "strava",
 "streak": 1
+},
+{
+"run_id": 16989424432,
+"name": "Evening Swim",
+"distance": 2350.0,
+"moving_time": "0:28:43",
+"type": "Swim",
+"start_date": "2026-01-09 12:12:55+00:00",
+"start_date_local": "2026-01-09 20:12:55",
+"location_country": null,
+"summary_polyline": "",
+"average_heartrate": 144.2,
+"average_speed": 1.364,
+"source": "strava",
+"streak": 1
 }
 ]
