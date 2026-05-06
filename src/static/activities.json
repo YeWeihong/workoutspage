@@ -3463,5 +3463,20 @@
 "average_speed": 5.452,
 "source": "strava",
 "streak": 1
+},
+{
+"run_id": 18400206634,
+"name": "Evening Ride",
+"distance": 15697.9,
+"moving_time": "0:42:35",
+"type": "Ride",
+"start_date": "2026-05-06 12:52:22+00:00",
+"start_date_local": "2026-05-06 20:52:22",
+"location_country": "\u79d1\u5b66\u5c9b\u793e\u533a, \u4e95\u5c97\u9547, \u8700\u5c71\u533a, \u5408\u80a5\u5e02, \u5b89\u5fbd\u7701, \u4e2d\u56fd",
+"summary_polyline": "w{waEm|_jUACJDp@?PCJ@\\K^]f@aATQf@m@lDqILU~DyJh@y@LW`BeE`CwFl@eBV]Vk@tAoDhHyPnAaDbFwLVg@PQTGX?zF^pBRrAHlBFhJGzC?ZAPIvB@vDGjFAb@Hl@@vDEp[EhHMnBa@nCa@pCk@~Bo@xBs@pCeAzAs@|A{@zAaAzKqGjMyHxEqC`B}@p@c@dAi@t@[jA_@dAYn@MdBU~@ClC?dBJtAD~ARlG`@HJJH@FD@@AG?R?v@OjAFlANzENhBClBO~B[dBa@TJHATW|As@rCaBpCiCvGwHz@_ArAmAl@o@~EqEnC{Bx@k@d@i@dA}@tAwA|DmDbAs@hAg@x@KTKpAUHGR@`Ea@H@JLd@WXELBDFJEBBPvBDLA?DECGK{ACo@EMGgACGCAMBsAl@_@J}Ep@{@Nc@Ro@Js@Xo@^iAz@cErDaBnAUHKHD?c@t@g@\\cCjBiJlIq@r@KFEAKHYh@y@x@}@fAq@~@uA`Be@f@wApA{@n@sCxAc@?OFy@z@UJaCh@_BPaCHqBAsH_@SGI[A?kATw@@iBUgCMcBS_ESiBAo@F{ALqB^cAXs@VyBfAcCtA{MdIwHnEqLdHyBfAs@VeDtAqA`@yCt@yBb@uDd@]FABgA@e@CsBL{BB_a@Hq@DUF_UF_@IK?cD?oCBoAAy@CiIk@mAGcAIq@KQJEHeA`Cw@jBGXoEnKw@bB[z@gBnEa@z@mBxEk@nAa@pAm@pA}EbL_EvJyAbDqCbHi@lAKNK\\m@tAm@`@eAFg@?IGAQ",
+"average_heartrate": 143.3,
+"average_speed": 6.144,
+"source": "strava",
+"streak": 1
 }
 ]
