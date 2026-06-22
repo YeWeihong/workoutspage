@@ -3511,7 +3511,7 @@
 },
 {
 "run_id": 18911272311,
-"name": "Morning Hike",
+"name": "\u5927\u8700\u5c71\u5df4\u638c\u7ebf",
 "distance": 10942.4,
 "moving_time": "2:22:19",
 "type": "Hike",
@@ -3526,7 +3526,7 @@
 },
 {
 "run_id": 18982278554,
-"name": "Morning Hike",
+"name": "\u5357\u592a\u884cday1\uff1a\u97e9\u53e3-\u9521\u5d16\u6c9f",
 "distance": 19521.6,
 "moving_time": "6:19:10",
 "type": "Hike",
@@ -3541,7 +3541,7 @@
 },
 {
 "run_id": 18992681115,
-"name": "Morning Hike",
+"name": "\u5357\u592a\u884cday2\uff1a\u9521\u5d16\u6c9f-\u516b\u91cc\u6c9f",
 "distance": 29679.0,
 "moving_time": "6:57:44",
 "type": "Hike",
