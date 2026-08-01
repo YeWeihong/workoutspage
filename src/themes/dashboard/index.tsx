@@ -1,6 +1,6 @@
 import './index.css';
 import { useMemo, useState } from 'react';
-import type { Activity } from '@/types';
+import type { Activity, SportFilter } from '@/types';
 import {
   useFilteredActivities,
   getAvailableYears,
@@ -24,7 +24,7 @@ type Page = 'home' | 'tracks';
 function Dashboard() {
   const activities = getActivityData() as Activity[];
   const { dark, toggle } = useTheme();
-  const [filter] = useState('all' as const);
+  const [filter, setFilter] = useState<SportFilter>('all');
   const [year, setYear] = useState<number | null>(null);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
     null
@@ -50,22 +50,30 @@ function Dashboard() {
         dark={dark}
         toggleTheme={toggle}
         activities={activities}
+        filter={filter}
+        onFilterChange={(nextFilter) => {
+          setFilter(nextFilter);
+          setYear(null);
+          setSelectedActivity(null);
+          setSelectedProvince(null);
+        }}
         page={page}
         onNavigate={setPage}
       />
 
       {page === 'tracks' ? (
         <TracksPage
+          key={filter}
           activities={filtered}
           filter={filter}
           onSelectActivity={setSelectedActivity}
           onBack={() => setPage('home')}
         />
       ) : (
-        <main className="mx-auto max-w-[1400px] px-6 py-6">
-          <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-[1fr_360px] xl:grid-cols-[1fr_380px]">
+        <main className="mx-auto max-w-[1400px] px-4 py-4 sm:px-6 sm:py-6">
+          <div className="grid grid-cols-1 items-start gap-4 sm:gap-6 lg:grid-cols-[minmax(0,1fr)_360px] xl:grid-cols-[minmax(0,1fr)_380px]">
             {/* Left column */}
-            <div className="min-w-0 space-y-6 overflow-hidden">
+            <div className="min-w-0 space-y-4 overflow-hidden sm:space-y-6">
               <StatsCards
                 activities={filtered}
                 allActivities={activities}
@@ -86,12 +94,11 @@ function Dashboard() {
                 setYear={setYear}
                 selectedActivity={selectedActivity}
                 onSelectActivity={setSelectedActivity}
-                filter={filter}
               />
             </div>
 
             {/* Right column */}
-            <div className="flex min-w-0 flex-col gap-6 overflow-hidden">
+            <div className="flex min-w-0 flex-col gap-4 overflow-hidden sm:gap-6">
               <ProfileCard activities={activities} filter={filter} />
               <ChinaMap
                 activities={filtered}
@@ -122,7 +129,7 @@ function Dashboard() {
       )}
 
       <footer className="border-t border-[var(--color-border)] py-6 text-center text-sm text-[var(--color-muted)]">
-        &copy; {new Date().getFullYear()} Running Page 3.0
+        &copy; {new Date().getFullYear()} OUTDOOR.PAGE
       </footer>
     </div>
   );

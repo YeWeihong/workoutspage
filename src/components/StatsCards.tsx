@@ -2,6 +2,7 @@ import type { Activity, SportFilter } from '../types';
 import { formatDistance, parseMovingTime } from '../hooks/useActivities';
 import { useLocale } from '../hooks/useLocale';
 import { GOALS, DEFAULT_GOAL } from '../config';
+import { getSportColor, matchesSportFilter } from '../core/sports';
 
 interface StatsCardsProps {
   activities: Activity[];
@@ -49,7 +50,7 @@ export function StatsCards({
   const lastYearActivities = allActivities.filter((a) => {
     const d = new Date(a.start_date_local);
     if (d.getFullYear() !== currentYear - 1) return false;
-    if (filter !== 'all' && a.type !== filter) return false;
+    if (!matchesSportFilter(a.type, filter)) return false;
     const aDayOfYear = Math.floor(
       (d.getTime() - new Date(d.getFullYear(), 0, 1).getTime()) / 86400000
     );
@@ -78,7 +79,7 @@ export function StatsCards({
       d.getMonth() !== now.getMonth()
     )
       return false;
-    if (filter !== 'all' && a.type !== filter) return false;
+    if (!matchesSportFilter(a.type, filter)) return false;
     return true;
   });
   const monthDistance = monthActivities.reduce((s, a) => s + a.distance, 0);
@@ -96,7 +97,7 @@ export function StatsCards({
       now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear();
     if (d.getFullYear() !== targetYear || d.getMonth() !== targetMonth)
       return false;
-    if (filter !== 'all' && a.type !== filter) return false;
+    if (!matchesSportFilter(a.type, filter)) return false;
     return d.getDate() <= now.getDate();
   });
   const lastMonthDistance = lastMonthActivities.reduce(
@@ -120,7 +121,7 @@ export function StatsCards({
   const weekActivities = allActivities.filter((a) => {
     const d = new Date(a.start_date_local);
     if (d < weekStart) return false;
-    if (filter !== 'all' && a.type !== filter) return false;
+    if (!matchesSportFilter(a.type, filter)) return false;
     return true;
   });
   const weekDistance = weekActivities.reduce((s, a) => s + a.distance, 0);
@@ -136,7 +137,7 @@ export function StatsCards({
   const lastWeekActivities = allActivities.filter((a) => {
     const d = new Date(a.start_date_local);
     if (d < lastWeekStart || d > lastWeekSamePoint) return false;
-    if (filter !== 'all' && a.type !== filter) return false;
+    if (!matchesSportFilter(a.type, filter)) return false;
     return true;
   });
   const lastWeekDistance = lastWeekActivities.reduce(
@@ -292,7 +293,7 @@ export function StatsCards({
   const unit = filter === 'Run' ? t('runs') : t('activities');
 
   return (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_1fr_1fr_1.6fr]">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-[1fr_1fr_1fr_1.6fr]">
       {/* Yearly Goal */}
       <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 transition-all duration-300 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 hover:shadow-[var(--color-accent)]/5 hover:shadow-lg">
         <p className="mb-2 flex items-center gap-1.5 text-xs tracking-wider text-[var(--color-muted)] uppercase">
@@ -536,8 +537,7 @@ export function StatsCards({
             if (acts.length === 0) return '';
             const sorted = [...acts].sort((a, b) => b.distance - a.distance);
             const type = sorted[0].type;
-            if (type === 'Run') return '#f97316';
-            return 'var(--color-text)';
+            return getSportColor(type);
           }
 
           const weekDays = Array.from({ length: 7 }, (_, i) => {

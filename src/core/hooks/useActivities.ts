@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { Activity, SportFilter } from '../types';
+import { matchesSportFilter } from '../sports';
 
 // Canonical province extraction — handles all 3 location_country formats,
 // only returns Chinese provinces (filters out foreign locations).
@@ -106,7 +107,7 @@ export function useFilteredActivities(
   return useMemo(() => {
     let filtered = activities;
     if (filter !== 'all') {
-      filtered = filtered.filter((a) => a.type === filter);
+      filtered = filtered.filter((a) => matchesSportFilter(a.type, filter));
     }
     if (year) {
       filtered = filtered.filter((a) => {

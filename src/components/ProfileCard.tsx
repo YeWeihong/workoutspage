@@ -6,6 +6,11 @@ import {
   extractProvince,
 } from '../hooks/useActivities';
 import { AVATAR } from '../config';
+import {
+  getSportIcon,
+  getSportLabel,
+  matchesSportFilter,
+} from '../core/sports';
 
 interface ProfileCardProps {
   activities: Activity[];
@@ -17,7 +22,9 @@ export function ProfileCard({ activities, filter = 'all' }: ProfileCardProps) {
 
   // Filter activities by sport type for distance/count/time
   const filteredActivities =
-    filter === 'all' ? activities : activities.filter((a) => a.type === filter);
+    filter === 'all'
+      ? activities
+      : activities.filter((a) => matchesSportFilter(a.type, filter));
 
   const totalDistance = filteredActivities.reduce((s, a) => s + a.distance, 0);
   const totalCount = filteredActivities.length;
@@ -82,7 +89,7 @@ export function ProfileCard({ activities, filter = 'all' }: ProfileCardProps) {
   };
 
   return (
-    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5 transition-all duration-300 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 hover:shadow-[var(--color-accent)]/5 hover:shadow-lg">
+    <div className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4 transition-all duration-300 hover:border-[var(--color-accent)]/30 hover:bg-[var(--color-accent)]/5 hover:shadow-[var(--color-accent)]/5 hover:shadow-lg sm:p-5">
       {/* Avatar top-left + Distance */}
       <div className="flex items-center gap-4">
         <div className="h-14 w-14 shrink-0 overflow-hidden rounded-full border-2 border-[var(--color-border)]">
@@ -111,7 +118,7 @@ export function ProfileCard({ activities, filter = 'all' }: ProfileCardProps) {
           )}
         </div>
         <div className="flex-1 text-center">
-          <p className="font-mono text-3xl font-bold">
+          <p className="font-mono text-2xl font-bold sm:text-3xl">
             {formatDistance(totalDistance)}
             <span className="ml-1 text-base font-normal text-[var(--color-muted)]">
               km
@@ -223,8 +230,8 @@ export function ProfileCard({ activities, filter = 'all' }: ProfileCardProps) {
             {locale === 'zh' ? '最近活动' : 'Latest Activity'}
           </p>
           <p className="text-sm font-medium">
-            {latest.type === 'Run' ? '🏃 ' : '🚴 '}
-            {latest.name || (latest.type === 'Run' ? 'Run' : 'Ride')}
+            {getSportIcon(latest.type)}{' '}
+            {latest.name || getSportLabel(latest.type, locale)}
             <span className="font-normal text-[var(--color-muted)]">
               {' '}
               · {formatDistance(latest.distance)} km ·{' '}

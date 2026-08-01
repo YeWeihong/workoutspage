@@ -4,6 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import * as polyline from '@mapbox/polyline';
 import type { Activity } from '../types';
 import { MAPBOX_TOKEN } from '../config';
+import { getSportColor, normalizeSportType } from '../core/sports';
 
 interface RouteMapProps {
   activities: Activity[];
@@ -56,7 +57,7 @@ export function RouteMap({
         type: 'line',
         source: 'selected',
         paint: {
-          'line-color': selectedActivity.type === 'Run' ? '#f97316' : '#3b82f6',
+          'line-color': getSportColor(selectedActivity.type),
           'line-width': 3,
           'line-opacity': 0.9,
         },
@@ -77,7 +78,7 @@ export function RouteMap({
           .map(([lat, lng]) => [lng, lat]);
         return {
           type: 'Feature' as const,
-          properties: { type: a.type },
+          properties: { type: normalizeSportType(a.type) },
           geometry: {
             type: 'LineString' as const,
             coordinates: coords,
@@ -107,6 +108,12 @@ export function RouteMap({
           '#f97316',
           'Ride',
           '#3b82f6',
+          'Hike',
+          '#22c55e',
+          'Walk',
+          '#14b8a6',
+          'Swim',
+          '#06b6d4',
           '#a855f7',
         ],
         'line-width': 1.5,
@@ -179,7 +186,7 @@ export function RouteMap({
   }, [activities, selectedActivity]);
 
   return (
-    <div className="relative h-[280px] overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-card)]">
+    <div className="relative h-[240px] overflow-hidden rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] sm:h-[280px]">
       {selectedActivity && (
         <button
           onClick={onClearSelection}

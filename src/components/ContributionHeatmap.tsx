@@ -8,6 +8,7 @@ import {
   formatPace,
 } from '../hooks/useActivities';
 import { useLocale } from '../hooks/useLocale';
+import { normalizeSportType } from '../core/sports';
 
 const MAX_VISIBLE_YEARS = 10;
 
@@ -20,9 +21,10 @@ interface HeatmapProps {
 
 // Map any activity type to the 4 display categories
 function toDisplayType(type: string): 'Run' | 'Ride' | 'Hike' | 'Training' {
-  if (type === 'Run') return 'Run';
-  if (type === 'Ride') return 'Ride';
-  if (type === 'Hike') return 'Hike';
+  const normalized = normalizeSportType(type);
+  if (normalized === 'Run') return 'Run';
+  if (normalized === 'Ride') return 'Ride';
+  if (normalized === 'Hike') return 'Hike';
   return 'Training';
 }
 
@@ -113,7 +115,9 @@ export function ContributionHeatmap({
       (s, a) => s + parseMovingTime(a.moving_time),
       0
     );
-    const runs = yearActivities.filter((a) => a.type === 'Run');
+    const runs = yearActivities.filter(
+      (a) => normalizeSportType(a.type) === 'Run'
+    );
     // Average pace as distance-weighted mean speed (totalDistance / totalTime),
     // not an arithmetic mean of per-run speeds. M5 fix.
     const runDistance = runs.reduce((s, a) => s + a.distance, 0);
@@ -251,7 +255,9 @@ export function ContributionHeatmap({
         )
         .map((a) => toDisplayType(a.type))
     );
-    return (['Run', 'Training'] as const).filter((t) => types.has(t));
+    return (['Run', 'Ride', 'Hike', 'Training'] as const).filter((t) =>
+      types.has(t)
+    );
   }, [activities, selectedYear, isAll]);
 
   // Gym: monthly session breakdown
@@ -279,7 +285,15 @@ export function ContributionHeatmap({
       ? locale === 'zh'
         ? '跑步热力图'
         : 'Run Heatmap'
-      : t('heatmapTitle');
+      : filter === 'Ride'
+        ? locale === 'zh'
+          ? '骑行热力图'
+          : 'Ride Heatmap'
+        : filter === 'Hike'
+          ? locale === 'zh'
+            ? '徒步热力图'
+            : 'Hike Heatmap'
+          : t('heatmapTitle');
 
   const handleSelectYear = (yr: number | 'all') => {
     setSelectedYear(yr);
@@ -353,7 +367,7 @@ export function ContributionHeatmap({
   return (
     <div
       ref={captureRef}
-      className="overflow-x-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-5"
+      className="overflow-x-auto rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-3 sm:p-5"
     >
       <style>{`
         @keyframes fadeSlideIn {

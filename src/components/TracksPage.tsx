@@ -3,7 +3,7 @@ import { toPng } from 'html-to-image';
 import * as polyline from '@mapbox/polyline';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import type { Activity } from '../types';
+import type { Activity, PrimarySportType, SportFilter } from '../types';
 import {
   getAvailableYears,
   formatDistance,
@@ -12,12 +12,18 @@ import {
 } from '../hooks/useActivities';
 import { useLocale } from '../hooks/useLocale';
 import { MAPBOX_TOKEN } from '../config';
+import {
+  getSportColor,
+  matchesSportFilter,
+  normalizeSportType,
+  PRIMARY_SPORTS,
+} from '../core/sports';
 
-type SportType = 'Run';
+type SportType = PrimarySportType;
 
 interface TracksPageProps {
   activities: Activity[];
-  filter: string;
+  filter: SportFilter;
   onBack: () => void;
   onSelectActivity?: (a: Activity | null) => void;
 }
@@ -159,7 +165,7 @@ function TrackMap({
       .filter((a) => a.summary_polyline)
       .map((a) => ({
         type: 'Feature' as const,
-        properties: { type: a.type },
+        properties: { type: normalizeSportType(a.type) },
         geometry: {
           type: 'LineString' as const,
           coordinates: polyline
@@ -244,22 +250,21 @@ function TrackMap({
 }
 
 function getColor(a: Activity): string {
-  if (a.type === 'Run') {
-    const km = a.distance / 1000;
-    return km >= 40 ? '#ef4444' : km >= 20 ? '#f97316' : '#f97316';
-  }
-  return '#a855f7';
+  return getSportColor(a.type);
 }
 
 export function TracksPage({
   activities,
+  filter,
   onBack,
   onSelectActivity,
 }: TracksPageProps) {
   const { locale } = useLocale();
   const allYears = getAvailableYears(activities);
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
-  const [sportFilter, setSportFilter] = useState<SportType | null>(null);
+  const [sportFilter, setSportFilter] = useState<SportType | null>(
+    filter === 'all' ? null : filter
+  );
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
     null
   );
@@ -279,7 +284,8 @@ export function TracksPage({
   );
 
   // Determine which sport types exist
-  const hasSport = (t: SportType) => activities.some((a) => a.type === t);
+  const hasSport = (t: SportType) =>
+    activities.some((a) => matchesSportFilter(a.type, t));
 
   // Filtered base (year + sport)
   const base = activities.filter((a) => {
@@ -288,7 +294,8 @@ export function TracksPage({
       new Date(a.start_date_local).getFullYear() !== selectedYear
     )
       return false;
-    if (sportFilter !== null && a.type !== sportFilter) return false;
+    if (sportFilter !== null && !matchesSportFilter(a.type, sportFilter))
+      return false;
     return true;
   });
 
@@ -302,7 +309,9 @@ export function TracksPage({
     (s, a) => s + parseMovingTime(a.moving_time),
     0
   );
-  const runs = base.filter((a) => a.type === 'Run' && a.average_speed > 0);
+  const runs = base.filter(
+    (a) => normalizeSportType(a.type) === 'Run' && a.average_speed > 0
+  );
   const avgPace =
     runs.length > 0
       ? runs.reduce((s, a) => s + a.average_speed, 0) / runs.length
@@ -379,12 +388,15 @@ export function TracksPage({
     onSelectActivity?.(a);
   };
 
-  const allSportTabs: { label: string; value: SportType; color: string }[] = [
-    { label: locale === 'zh' ? '跑步' : 'Run', value: 'Run', color: '#f97316' },
-  ];
+  const allSportTabs: { label: string; value: SportType; color: string }[] =
+    PRIMARY_SPORTS.map((sport) => ({
+      label: locale === 'zh' ? sport.zh : sport.en,
+      value: sport.type,
+      color: sport.color,
+    }));
 
   return (
-    <div className="mx-auto max-w-[1400px] px-6 py-6">
+    <div className="mx-auto max-w-[1400px] px-4 py-4 sm:px-6 sm:py-6">
       {/* Top bar: back + title */}
       <div className="mb-5 flex items-center gap-4">
         <button
@@ -526,12 +538,22 @@ export function TracksPage({
                 {selectedActivity.average_speed > 0 && (
                   <div>
                     <p className="text-[9px] tracking-wider text-[var(--color-muted)] uppercase">
-                      {locale === 'zh' ? '配速' : 'Pace'}
+                      {normalizeSportType(selectedActivity.type) === 'Ride'
+                        ? locale === 'zh'
+                          ? '速度'
+                          : 'Speed'
+                        : locale === 'zh'
+                          ? '配速'
+                          : 'Pace'}
                     </p>
                     <p className="font-mono text-base leading-tight font-bold">
-                      {formatPace(selectedActivity.average_speed)}{' '}
+                      {normalizeSportType(selectedActivity.type) === 'Ride'
+                        ? (selectedActivity.average_speed * 3.6).toFixed(1)
+                        : formatPace(selectedActivity.average_speed)}{' '}
                       <span className="text-[10px] font-normal text-[var(--color-muted)]">
-                        /km
+                        {normalizeSportType(selectedActivity.type) === 'Ride'
+                          ? 'km/h'
+                          : '/km'}
                       </span>
                     </p>
                   </div>
@@ -588,7 +610,7 @@ export function TracksPage({
             className="rounded-xl border border-[var(--color-border)] bg-[var(--color-card)] p-4"
           >
             {/* Year pills + sport filter */}
-            <div className="mb-4 flex items-center gap-1.5 border-b border-[var(--color-border)] pb-3">
+            <div className="mb-4 flex flex-wrap items-center gap-1.5 border-b border-[var(--color-border)] pb-3">
               {totalYearPages > 1 && (
                 <button
                   onClick={() => setYearPage((p) => Math.max(0, p - 1))}
@@ -627,7 +649,7 @@ export function TracksPage({
                 </button>
               )}
               {/* Sport filter — right side */}
-              <div className="ml-auto flex items-center gap-1.5">
+              <div className="flex w-full items-center gap-1.5 overflow-x-auto pt-2 sm:ml-auto sm:w-auto sm:pt-0">
                 <button
                   onClick={() => setSportFilter(null)}
                   className={`rounded-full border px-3 py-1 text-xs font-medium transition-all ${sportFilter === null ? 'border-transparent bg-[var(--color-accent)] text-white' : 'border-[var(--color-border)] text-[var(--color-muted)] hover:text-[var(--color-text)]'}`}
@@ -759,20 +781,19 @@ export function TracksPage({
             {/* Legend + sort */}
             {!clustering && clusteredTracks.length > 0 && (
               <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-[var(--color-border)] pt-3 text-xs text-[var(--color-muted)]">
-                {sportFilter === null || sportFilter === 'Run' ? (
-                  <>
-                    <span className="flex items-center gap-1.5">
-                      <span className="inline-block h-0.5 w-3 rounded bg-[#f97316]" />
-                      {locale === 'zh' ? '跑步' : 'Run'}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <span className="inline-block h-0.5 w-3 rounded bg-[#ef4444]" />
-                      {locale === 'zh' ? '跑步 >20km' : 'Run >20km'}
-                    </span>
-                  </>
-                ) : null}
-                {null}
-                {null}
+                {PRIMARY_SPORTS.filter(
+                  (sport) =>
+                    hasSport(sport.type) &&
+                    (sportFilter === null || sportFilter === sport.type)
+                ).map((sport) => (
+                  <span key={sport.type} className="flex items-center gap-1.5">
+                    <span
+                      className="inline-block h-0.5 w-3 rounded"
+                      style={{ backgroundColor: sport.color }}
+                    />
+                    {sport.icon} {locale === 'zh' ? sport.zh : sport.en}
+                  </span>
+                ))}
                 <div className="ml-auto flex items-center gap-1">
                   <span>
                     {clusteredTracks.length}{' '}
