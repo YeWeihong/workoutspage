@@ -2,7 +2,6 @@ interface ISiteMetadataResult {
   siteTitle: string;
   siteUrl: string;
   description: string;
-  keywords: string;
   logo: string;
   navLinks: {
     name: string;
@@ -14,8 +13,7 @@ const data: ISiteMetadataResult = {
   siteTitle: "Hong's Workouts Map",
   siteUrl: 'https://yeweihong.github.io/workoutspage',
   logo: 'https://avatars.githubusercontent.com/u/49354927?v=4',
-  description: 'Personal site and photo',
-  keywords: 'workouts, running, cycling, riding, roadtrip, hiking, swimming',
+  description: 'Personal workouts and activity map',
   navLinks: [
     {
       name: 'Weibo',

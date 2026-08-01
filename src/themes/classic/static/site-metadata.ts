@@ -1,0 +1,29 @@
+interface ISiteMetadataResult {
+  siteTitle: string;
+  siteUrl: string;
+  description: string;
+  logo: string;
+  navLinks: {
+    name: string;
+    url: string;
+  }[];
+}
+
+const data: ISiteMetadataResult = {
+  siteTitle: "Hong's Workouts Map",
+  siteUrl: 'https://yeweihong.github.io/workoutspage',
+  logo: 'https://avatars.githubusercontent.com/u/49354927?v=4',
+  description: 'Personal workouts and activity map',
+  navLinks: [
+    {
+      name: 'Weibo',
+      url: 'https://weibo.com/u/7827405869',
+    },
+    {
+      name: 'Photos',
+      url: 'https://www.xiaohongshu.com/user/profile/64b923b0000000001403ce6d',
+    },
+  ],
+};
+
+export default data;
