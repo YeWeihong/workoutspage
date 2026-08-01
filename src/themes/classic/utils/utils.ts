@@ -192,9 +192,36 @@ const intComma = (x = '') => {
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
+const normalizeActivityType = (type = ''): string => {
+  switch (type.toLowerCase()) {
+    case 'run':
+    case 'running':
+    case 'virtualrun':
+      return 'running';
+    case 'ride':
+    case 'cycling':
+      return 'cycling';
+    case 'hike':
+    case 'hiking':
+    case 'mountaineering':
+      return 'hiking';
+    case 'walk':
+    case 'walking':
+      return 'walking';
+    case 'swim':
+    case 'swimming':
+      return 'swimming';
+    default:
+      return type.toLowerCase();
+  }
+};
+
 const getActivitySport = (act: Activity): string => {
-  if (act.type === 'Run') {
-    if (act.subtype === 'generic') {
+  const activityType = normalizeActivityType(act.type);
+  const subtype = act.subtype?.toLowerCase();
+
+  if (activityType === 'running') {
+    if (subtype === 'generic') {
       const runDistance = act.distance / 1000;
       if (runDistance > 20 && runDistance < 40) {
         return RUN_TITLES.HALF_MARATHON_RUN_TITLE;
@@ -202,19 +229,19 @@ const getActivitySport = (act: Activity): string => {
         return RUN_TITLES.FULL_MARATHON_RUN_TITLE;
       }
       return ACTIVITY_TYPES.RUN_GENERIC_TITLE;
-    } else if (act.subtype === 'trail') return ACTIVITY_TYPES.RUN_TRAIL_TITLE;
-    else if (act.subtype === 'treadmill')
+    } else if (subtype === 'trail') return ACTIVITY_TYPES.RUN_TRAIL_TITLE;
+    else if (subtype === 'treadmill' || subtype === 'indoor')
       return ACTIVITY_TYPES.RUN_TREADMILL_TITLE;
     else return ACTIVITY_TYPES.RUN_GENERIC_TITLE;
-  } else if (act.type === 'hiking') {
+  } else if (activityType === 'hiking') {
     return ACTIVITY_TYPES.HIKING_TITLE;
-  } else if (act.type === 'cycling') {
+  } else if (activityType === 'cycling') {
     return ACTIVITY_TYPES.CYCLING_TITLE;
-  } else if (act.type === 'walking') {
+  } else if (activityType === 'walking') {
     return ACTIVITY_TYPES.WALKING_TITLE;
-  }
-  // if act.type contains 'skiing'
-  else if (act.type.includes('skiing')) {
+  } else if (activityType === 'swimming') {
+    return ACTIVITY_TYPES.SWIMMING_TITLE;
+  } else if (activityType.includes('skiing')) {
     return ACTIVITY_TYPES.SKIING_TITLE;
   }
   return '';
@@ -223,8 +250,8 @@ const getActivitySport = (act: Activity): string => {
 const titleForRun = (run: Activity): string => {
   if (RICH_TITLE) {
     // 1. try to use user defined name
-    if (run.name != '') {
-      return run.name;
+    if (run.name.trim() !== '') {
+      return run.name.trim();
     }
     // 2. try to use location+type if the location is available, eg. 'Shanghai Run'
     const { city } = locationForRun(run);
@@ -233,7 +260,13 @@ const titleForRun = (run: Activity): string => {
       return `${city} ${activity_sport}`;
     }
   }
-  // 3. use time+length if location or type is not available
+  // 3. Only running activities may receive marathon/time-of-day names.
+  // Other sports must retain their own activity type.
+  const activitySport = getActivitySport(run);
+  if (normalizeActivityType(run.type) !== 'running') {
+    return activitySport || run.type || ACTIVITY_TYPES.ALL_TITLE;
+  }
+
   const runDistance = run.distance / 1000;
   const runHour = +run.start_date_local.slice(11, 13);
   if (runDistance > 20 && runDistance < 40) {
@@ -309,4 +342,5 @@ export {
   sortDateFuncReverse,
   formatRunTime,
   convertMovingTime2Sec,
+  normalizeActivityType,
 };

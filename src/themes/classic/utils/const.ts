@@ -37,20 +37,20 @@ const ROAD_LABEL_DISPLAY = true;
 // updated on 2024/11/17: privacy mode is set to true by default
 //set to `true` if you want to display only the routes without showing the map.
 const PRIVACY_MODE = false;
-// updated on 2024/11/17: lights are turned off by default
-//set to `false` if you want to make light off as default, only effect when `PRIVACY_MODE` = false
-const LIGHTS_ON = false;
+// Keep the MapCN basemap visible by default. Users can still hide it with the
+// light control, which leaves only the activity routes on the dark canvas.
+const LIGHTS_ON = true;
 //set to `true` if you want to show the 'Elevation Gain' column
 const SHOW_ELEVATION_GAIN = false;
-// richer title for the activity types (like garmin style)
-const RICH_TITLE = false;
+// Prefer the original activity name supplied by Garmin, Keep, or Strava.
+const RICH_TITLE = true;
 
 // IF you are outside China please make sure IS_CHINESE = false
 const IS_CHINESE = true;
 const USE_ANIMATION_FOR_GRID = false;
 const CHINESE_INFO_MESSAGE = (yearLength: number, year: string): string => {
   const yearStr = year === 'Total' ? '所有' : ` ${year} `;
-  return `记录自己跑步 ${yearLength} 年了，下面列表展示的是${yearStr}的数据`;
+  return `记录自己的运动 ${yearLength} 年了，下面列表展示的是${yearStr}的数据`;
 };
 const ENGLISH_INFO_MESSAGE = (yearLength: number, year: string): string =>
   `Running Journey with ${yearLength} Years, the table shows year ${year} data`;
@@ -224,7 +224,7 @@ export const INDOOR_COLOR = '#8899aa';
 
 // map tiles vendor, maptiler or mapbox or stadiamaps
 // if you want to use maptiler, set the access token in MAP_TILE_ACCESS_TOKEN
-export const MAP_TILE_VENDOR = 'mapcn';
+export const MAP_TILE_VENDOR = 'mapcn_amap';
 
 // map tiles style name, see MAP_TILE_STYLES for more details
 export const MAP_TILE_STYLE_LIGHT = 'osm-bright';
@@ -249,6 +249,11 @@ export const MAP_TILE_STYLES = {
   mapcn_openfreemap: {
     'osm-bright': 'https://tiles.openfreemap.org/styles/bright',
     'dark-matter': 'https://tiles.openfreemap.org/styles/dark',
+  },
+  // Mainland-China fallback. The actual Mapbox style is built in geoUtils.ts.
+  mapcn_amap: {
+    'osm-bright': 'amap://streets',
+    'dark-matter': 'amap://streets-dark',
   },
   mapcn_maptiler_free: {
     // Use free, tokenless styles to avoid requiring an API key

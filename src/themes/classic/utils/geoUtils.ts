@@ -3,6 +3,7 @@ import gcoord from 'gcoord';
 import { WebMercatorViewport } from '@math.gl/web-mercator';
 import type { FeatureCollection, LineString, Feature } from 'geojson';
 import type { GeoJsonProperties } from 'geojson';
+import type { StyleSpecification } from 'mapbox-gl';
 import type { RPGeometry } from '../static/run_countries';
 import worldGeoJsonUrl from '../static/world.zh.json?url';
 import { getMapThemeFromCurrentTheme } from '../hooks/useTheme';
@@ -178,7 +179,40 @@ export const getMapStyle = (
   vendor: string,
   styleName: string,
   token: string
-) => {
+): string | StyleSpecification => {
+  if (vendor === 'mapcn_amap') {
+    const isDark = styleName === MAP_TILE_STYLE_DARK;
+    return {
+      version: 8,
+      sources: {
+        'mapcn-amap': {
+          type: 'raster',
+          tiles: [
+            'https://webrd01.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=7&x={x}&y={y}&z={z}',
+          ],
+          tileSize: 256,
+          attribution: '© 高德地图',
+        },
+      },
+      layers: [
+        {
+          id: 'mapcn-amap',
+          type: 'raster',
+          source: 'mapcn-amap',
+          minzoom: 0,
+          maxzoom: 19,
+          paint: isDark
+            ? {
+                'raster-brightness-max': 0.68,
+                'raster-contrast': 0.12,
+                'raster-saturation': -0.25,
+              }
+            : undefined,
+        },
+      ],
+    };
+  }
+
   const style = getMapTileVendorStyles(vendor)?.[styleName];
   if (!style) {
     return MAP_TILE_STYLES.default;

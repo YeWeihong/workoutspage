@@ -15,7 +15,7 @@ import { ACTIVITY_TOTAL, LOADING_TEXT } from '../../utils/const';
 import { totalStat, yearSummaryStats } from '@assets/index';
 import { loadSvgComponent } from '../../utils/svgUtils';
 import { SHOW_ELEVATION_GAIN, HOME_PAGE_TITLE } from '../../utils/const';
-import { DIST_UNIT, M_TO_DIST } from '../../utils/utils';
+import { DIST_UNIT, M_TO_DIST, normalizeActivityType } from '../../utils/utils';
 import type { Activity } from '../../utils/utils';
 import useActivities from '../../hooks/useActivities';
 // Layout constants (avoid magic numbers)
@@ -164,19 +164,9 @@ const getSportTypeOptions = (activityData: Activity[]) => {
   const cache = getActivityListCache(activityData);
   if (cache.sportTypeOptions) return cache.sportTypeOptions;
 
-  const sportTypeSet = new Set(activityData.map((activity) => activity.type));
-  if (sportTypeSet.has('Run')) {
-    sportTypeSet.delete('Run');
-    sportTypeSet.add('running');
-  }
-  if (sportTypeSet.has('Walk')) {
-    sportTypeSet.delete('Walk');
-    sportTypeSet.add('walking');
-  }
-  if (sportTypeSet.has('Ride')) {
-    sportTypeSet.delete('Ride');
-    sportTypeSet.add('cycling');
-  }
+  const sportTypeSet = new Set(
+    activityData.map((activity) => normalizeActivityType(activity.type))
+  );
   cache.sportTypeOptions = ['all', ...sportTypeSet];
   return cache.sportTypeOptions;
 };
@@ -235,16 +225,7 @@ const generateLabels = (interval: string, period: string): number[] => {
 
 const matchesSportType = (activity: Activity, sportTypeArg: string) => {
   if (sportTypeArg === 'all') return true;
-  if (sportTypeArg === 'running') {
-    return activity.type === 'running' || activity.type === 'Run';
-  }
-  if (sportTypeArg === 'walking') {
-    return activity.type === 'walking' || activity.type === 'Walk';
-  }
-  if (sportTypeArg === 'cycling') {
-    return activity.type === 'cycling' || activity.type === 'Ride';
-  }
-  return activity.type === sportTypeArg;
+  return normalizeActivityType(activity.type) === sportTypeArg;
 };
 
 const createEmptyActivitySummary = (): ActivitySummary => ({
