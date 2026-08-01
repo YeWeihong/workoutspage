@@ -32,6 +32,23 @@ def test_normalizes_hiking_type_for_duplicate_detection():
     assert keep_sync.is_existing_activity(keep_track, [garmin_activity])
 
 
+def test_matches_keep_walk_and_virtual_run_types():
+    keep_walk = activity("2026-07-01 06:30:00", activity_type="Walk")
+    garmin_hike = activity("2026-07-01 06:30:00", activity_type="Hike")
+    keep_virtual_run = activity("2026-07-02 06:30:00", activity_type="VirtualRun")
+    garmin_run = activity("2026-07-02 06:30:00", activity_type="Run")
+
+    assert keep_sync.is_existing_activity(keep_walk, [garmin_hike])
+    assert keep_sync.is_existing_activity(keep_virtual_run, [garmin_run])
+
+
+def test_close_start_time_wins_over_platform_distance_drift():
+    keep_track = activity("2026-07-01 06:30:25", distance=13_000)
+    garmin_activity = activity("2026-07-01 06:30:00", distance=5_000)
+
+    assert keep_sync.is_existing_activity(keep_track, [garmin_activity])
+
+
 def test_does_not_merge_different_workouts():
     keep_track = activity("2026-07-01 06:35:00", distance=15_000)
     garmin_activity = activity("2026-07-01 06:30:00", distance=10_000)
@@ -49,6 +66,7 @@ def test_keep_sync_state_round_trip(tmp_path, monkeypatch):
     assert json.loads(state_path.read_text(encoding="utf-8")) == {
         "processed_ids": ["100", "200"]
     }
+    assert state_path.read_bytes().endswith(b"\n")
 
 
 def test_disabled_privacy_filters_do_not_change_route(monkeypatch):

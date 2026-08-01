@@ -58,8 +58,9 @@ KEEP_SYNC_STATE_FILE = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "keep_sync_state.json",
 )
-DUPLICATE_START_TOLERANCE_SECONDS = 10
-DUPLICATE_DISTANCE_TOLERANCE_METERS = 200
+DUPLICATE_STRICT_START_TOLERANCE_SECONDS = 30
+DUPLICATE_START_TOLERANCE_SECONDS = 60
+DUPLICATE_DISTANCE_TOLERANCE_METERS = 500
 
 
 def login(session, mobile, password):
@@ -97,14 +98,18 @@ def save_keep_sync_state(processed_ids):
             ensure_ascii=False,
             indent=2,
         )
+        state_file.write("\n")
     os.replace(temporary_file, KEEP_SYNC_STATE_FILE)
 
 
 def normalize_activity_type(activity_type):
     return {
         "Hiking": "Hike",
+        "Walking": "Hike",
+        "Walk": "Hike",
         "Cycling": "Ride",
         "Running": "Run",
+        "VirtualRun": "Run",
     }.get(activity_type, activity_type)
 
 
@@ -123,16 +128,20 @@ def is_existing_activity(track, existing_activities):
             )
         except (TypeError, ValueError):
             continue
-        if (
-            abs((activity_start - track_start).total_seconds())
-            > DUPLICATE_START_TOLERANCE_SECONDS
-        ):
+        start_delta = abs((activity_start - track_start).total_seconds())
+        if start_delta > DUPLICATE_START_TOLERANCE_SECONDS:
             continue
+
+        # Garmin China and Keep can disagree substantially about distance, but
+        # two activities of the same kind starting within 30 seconds are the
+        # same transferred workout for practical purposes.
+        if start_delta <= DUPLICATE_STRICT_START_TOLERANCE_SECONDS:
+            return True
 
         activity_distance = float(activity.distance or 0)
         distance_tolerance = max(
             DUPLICATE_DISTANCE_TOLERANCE_METERS,
-            max(activity_distance, track_distance) * 0.05,
+            max(activity_distance, track_distance) * 0.10,
         )
         if abs(activity_distance - track_distance) <= distance_tolerance:
             return True
