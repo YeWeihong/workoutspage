@@ -56,6 +56,12 @@ build-backend = "pdm.backend"
 distribution = true
 packages = ["run_page"]
 
+[tool.ruff.lint]
+# Keep CI focused on syntax errors, undefined names, and unused imports.
+# New Ruff releases enable broader rule sets that flag hundreds of unrelated
+# legacy style issues in the upstream project.
+select = ["E4", "E7", "E9", "F"]
+
 [dependency-groups]
 dev = [
     "pytest>=9.0.3",

@@ -3,7 +3,6 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
-
 RUN_PAGE_DIR = Path(__file__).parent / "run_page"
 sys.path.insert(0, str(RUN_PAGE_DIR))
 
