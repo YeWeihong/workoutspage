@@ -3,8 +3,8 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import * as polyline from '@mapbox/polyline';
 import type { Activity } from '../types';
-import { MAPBOX_TOKEN } from '../config';
 import { getSportColor, normalizeSportType } from '../core/sports';
+import { getDashboardMapStyle } from '../core/mapStyles';
 
 interface RouteMapProps {
   activities: Activity[];
@@ -22,10 +22,7 @@ export function RouteMap({
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
 
-  const style =
-    dark !== false
-      ? 'mapbox://styles/mapbox/dark-v11'
-      : 'mapbox://styles/mapbox/light-v11';
+  const style = getDashboardMapStyle(dark);
 
   // Declared before the effects that reference it (react-hooks/immutability).
   function updateRoutes() {
@@ -156,7 +153,6 @@ export function RouteMap({
       return;
     }
 
-    mapboxgl.accessToken = MAPBOX_TOKEN;
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style,

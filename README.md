@@ -14,7 +14,7 @@ The custom work listed below was implemented, debugged, tested, committed, and d
 - 修复 Keep 与其他来源之间的活动去重，避免同一活动被重复导入。
 - 切换到 Dashboard 主题，将页面品牌从 `RUNNING.PAGE` 改为 `OUTDOOR.PAGE`。
 - 完善跑步、骑行和徒步的分类、图标、统计名称及筛选支持。
-- 使用 MapCN 作为主要地图源，修复黑色地图、轨迹渲染及错误活动名称等问题。
+- 使用免 Token 的 MapCN/OpenFreeMap 作为 Dashboard 地图源，修复黑色地图、轨迹渲染及错误活动名称等问题。
 - 改善桌面端和移动端布局，包括导航、统计卡片、运动记录和热力图显示。
 - 增加按时间展示的累计里程面积图；新活动同步后会自动计入总里程。
 - 增加隐蔽的活动名称管理入口。名称通过仓库权限保护的 GitHub Contents API 保存，普通访客无法直接修改。
@@ -319,7 +319,7 @@ pnpm develop
 
 ## Change Default Map Tile Style (Classic Theme)
 
-> If using the **classic** theme, you can customize the map tile style in the classic theme's configuration. The dashboard theme uses Mapbox by default (configured via `config.yml`).
+> If using the **classic** theme, you can customize the map tile style in the classic theme's configuration. The dashboard theme uses token-free MapCN/OpenFreeMap by default; `MAPBOX_TOKEN` is only needed when explicitly switching back to Mapbox.
 
 ```typescript
 const MAP_TILE_VENDOR = 'mapcn'; // Default (free!)
@@ -353,6 +353,7 @@ When using MapCN (Carto Basemaps), please ensure you comply with their attributi
 - Map data: © [OpenStreetMap](https://www.openstreetmap.org/copyright) contributors
 
 The project template already includes appropriate attribution in the map display.
+The Dashboard's OpenFreeMap style also supplies its attribution directly in the map.
 
 ## Using Other Providers
 If you prefer Mapbox, MapTiler, or Stadia Maps, you can change the vendor:
