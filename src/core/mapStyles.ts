@@ -1,7 +1,7 @@
-const MAPCN_STYLE_LIGHT = 'https://tiles.openfreemap.org/styles/bright';
-const MAPCN_STYLE_DARK = 'https://tiles.openfreemap.org/styles/dark';
+const MAPBOX_STYLE_LIGHT = 'mapbox://styles/mapbox/light-v11';
+const MAPBOX_STYLE_DARK = 'mapbox://styles/mapbox/dark-v11';
 
-/** Token-free MapCN/OpenFreeMap basemap used by the Dashboard theme. */
+/** Mapbox basemap used by the Dashboard theme. */
 export function getDashboardMapStyle(dark?: boolean): string {
-  return dark === false ? MAPCN_STYLE_LIGHT : MAPCN_STYLE_DARK;
+  return dark === false ? MAPBOX_STYLE_LIGHT : MAPBOX_STYLE_DARK;
 }

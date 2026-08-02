@@ -3,6 +3,7 @@ import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import * as polyline from '@mapbox/polyline';
 import type { Activity } from '../types';
+import { MAPBOX_TOKEN } from '../core/config';
 import { getSportColor, normalizeSportType } from '../core/sports';
 import { getDashboardMapStyle } from '../core/mapStyles';
 
@@ -156,6 +157,7 @@ export function RouteMap({
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style,
+      accessToken: MAPBOX_TOKEN,
       center: [121.4, 31.2],
       zoom: 10,
     });

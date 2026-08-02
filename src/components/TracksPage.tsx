@@ -11,6 +11,7 @@ import {
   formatPace,
 } from '../hooks/useActivities';
 import { useLocale } from '../hooks/useLocale';
+import { MAPBOX_TOKEN } from '../core/config';
 import {
   getSportColor,
   matchesSportFilter,
@@ -223,6 +224,7 @@ function TrackMap({
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style,
+      accessToken: MAPBOX_TOKEN,
       center: [108, 35],
       zoom: 3,
     });
