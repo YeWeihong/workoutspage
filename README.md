@@ -1,3 +1,28 @@
+# OUTDOOR.PAGE
+
+这是 [YeWeihong 的个人户外运动页面](https://20151243.xyz/workoutspage/)，项目基于 [yihong0618/running_page](https://github.com/yihong0618/running_page) 开发，并保留原项目的开源许可与贡献历史。
+
+## 本仓库的定制与 AI 协作说明
+
+本仓库以下定制工作由 **OpenAI Codex（AI 编程代理）** 根据 YeWeihong 提出的需求完成，包括代码实现、问题排查、测试、Git 提交和部署检查。YeWeihong 负责提出需求、确认产品方向、配置个人账号及维护自己的运动数据。这些改动并非由仓库所有者独立编写。
+
+The custom work listed below was implemented, debugged, tested, committed, and deployment-checked by **OpenAI Codex**, working from YeWeihong's requirements and decisions. It should not be represented as work completed solely by the repository owner.
+
+主要定制内容：
+
+- 在保留个人历史运动数据的前提下，将代码更新到 `running_page 3.0` 架构，并把主要数据同步来源迁移到 Keep。
+- 修复 Keep 与其他来源之间的活动去重，避免同一活动被重复导入。
+- 切换到 Dashboard 主题，将页面品牌从 `RUNNING.PAGE` 改为 `OUTDOOR.PAGE`。
+- 完善跑步、骑行和徒步的分类、图标、统计名称及筛选支持。
+- 使用 MapCN 作为主要地图源，修复黑色地图、轨迹渲染及错误活动名称等问题。
+- 改善桌面端和移动端布局，包括导航、统计卡片、运动记录和热力图显示。
+- 增加按时间展示的累计里程面积图；新活动同步后会自动计入总里程。
+- 增加隐蔽的活动名称管理入口。名称通过仓库权限保护的 GitHub Contents API 保存，普通访客无法直接修改。
+- 重新设计轨迹墙的重复路线统计：`×N` 表示同类相似路线的完成次数，并综合运动类型、距离、起终点和完整轨迹形状判断。
+- 完善 GitHub Actions、CI 检查和 GitHub Pages 自动部署流程。
+
+相关定制提交可从 [`ac44943`](https://github.com/YeWeihong/workoutspage/commit/ac44943) 至最新提交的历史中查看。原始项目及通用功能的著作权仍归其各自贡献者所有。
+
 ## Note
 
 1. clone or Fork before vercel 404 need to pull the latest code
