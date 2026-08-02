@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import type { Activity, SportFilter } from '../types';
 import { matchesSportFilter } from '../sports';
+import activityNameOverridesData from '@/static/activity-name-overrides.json';
 
 // Canonical province extraction — handles all 3 location_country formats,
 // only returns Chinese provinces (filters out foreign locations).
@@ -168,8 +169,16 @@ const loadActivityData = () => {
       return response.json() as Promise<Activity[]>;
     })
     .then((data) => {
-      activityDataCache = data;
-      return data;
+      const activityNameOverrides = activityNameOverridesData as Record<
+        string,
+        string
+      >;
+      const activities = data.map((activity) => {
+        const name = activityNameOverrides[String(activity.run_id)]?.trim();
+        return name ? { ...activity, name } : activity;
+      });
+      activityDataCache = activities;
+      return activities;
     })
     .catch((error: unknown) => {
       activityDataError = error;

@@ -395,9 +395,11 @@ export function ContributionHeatmap({
       `}</style>
 
       {/* Header */}
-      <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">{heatmapTitle}</h2>
-        <div className="flex items-center gap-1.5">
+      <div className="mb-4 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="shrink-0 text-lg font-semibold whitespace-nowrap">
+          {heatmapTitle}
+        </h2>
+        <div className="flex max-w-full items-center gap-1.5 overflow-x-auto pb-1 sm:overflow-visible sm:pb-0">
           {/* ALL button */}
           <button
             onClick={() => handleSelectYear('all')}

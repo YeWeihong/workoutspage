@@ -18,12 +18,26 @@ import { ProfileCard } from '@/components/ProfileCard';
 import { PersonalBest } from '@/components/PersonalBest';
 import { TracksPage } from '@/components/TracksPage';
 import { ChinaMap } from '@/components/ChinaMap';
+import { CumulativeDistanceChart } from '@/components/CumulativeDistanceChart';
 
 type Page = 'home' | 'tracks';
 
 function Dashboard() {
-  const activities = getActivityData() as Activity[];
+  const sourceActivities = getActivityData() as Activity[];
   const { dark, toggle } = useTheme();
+  const [sessionNameOverrides, setSessionNameOverrides] = useState<
+    Record<number, string>
+  >({});
+  const [adminMode] = useState(
+    () => new URLSearchParams(window.location.search).get('edit') === '1'
+  );
+  const activities = useMemo(() => {
+    if (Object.keys(sessionNameOverrides).length === 0) return sourceActivities;
+    return sourceActivities.map((activity) => {
+      const name = sessionNameOverrides[activity.run_id];
+      return name ? { ...activity, name } : activity;
+    });
+  }, [sourceActivities, sessionNameOverrides]);
   const [filter, setFilter] = useState<SportFilter>('all');
   const [year, setYear] = useState<number | null>(null);
   const [selectedActivity, setSelectedActivity] = useState<Activity | null>(
@@ -34,6 +48,7 @@ function Dashboard() {
 
   const years = getAvailableYears(activities);
   const filtered = useFilteredActivities(activities, filter, year);
+  const allTimeFiltered = useFilteredActivities(activities, filter, null);
   const heatmapYear = year ?? years[0] ?? new Date().getFullYear();
 
   // Activities filtered to the selected province (for RouteMap)
@@ -81,6 +96,10 @@ function Dashboard() {
                 filter={filter}
                 onSelectActivity={setSelectedActivity}
               />
+              <CumulativeDistanceChart
+                activities={allTimeFiltered}
+                filter={filter}
+              />
               <ContributionHeatmap
                 activities={filtered}
                 year={heatmapYear}
@@ -94,6 +113,16 @@ function Dashboard() {
                 setYear={setYear}
                 selectedActivity={selectedActivity}
                 onSelectActivity={setSelectedActivity}
+                adminMode={adminMode}
+                onActivityRenamed={(runId, name) => {
+                  setSessionNameOverrides((current) => ({
+                    ...current,
+                    [runId]: name,
+                  }));
+                  setSelectedActivity((current) =>
+                    current?.run_id === runId ? { ...current, name } : current
+                  );
+                }}
               />
             </div>
 

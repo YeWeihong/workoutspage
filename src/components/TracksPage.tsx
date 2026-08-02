@@ -18,6 +18,7 @@ import {
   normalizeSportType,
   PRIMARY_SPORTS,
 } from '../core/sports';
+import { clusterSimilarTracks } from '../core/routeClusters';
 
 type SportType = PrimarySportType;
 
@@ -317,7 +318,7 @@ export function TracksPage({
       ? runs.reduce((s, a) => s + a.average_speed, 0) / runs.length
       : 0;
 
-  // Cluster tracks — defer heavy work
+  // Cluster genuinely similar routes, deferring the heavier shape comparison.
   type Cluster = { representative: Activity; count: number; color: string };
   const [clusteredTracks, setClusteredTracks] = useState<Cluster[]>([]);
   const [clustering, setClustering] = useState(true);
@@ -325,58 +326,12 @@ export function TracksPage({
   useEffect(() => {
     setClustering(true);
     const id = setTimeout(() => {
-      const acts = [...withPolyline].sort(
-        (a, b) =>
-          new Date(b.start_date_local).getTime() -
-          new Date(a.start_date_local).getTime()
+      const clusters: Cluster[] = clusterSimilarTracks(withPolyline).map(
+        (cluster) => ({
+          ...cluster,
+          color: getColor(cluster.representative),
+        })
       );
-      type Decoded = {
-        start: [number, number];
-        end: [number, number];
-        distBucket: number;
-      };
-      const decoded: (Decoded | null)[] = acts.map((a) => {
-        try {
-          const coords = polyline.decode(a.summary_polyline!);
-          if (coords.length < 2) return null;
-          return {
-            start: coords[0] as [number, number],
-            end: coords[coords.length - 1] as [number, number],
-            distBucket: Math.round(a.distance / 2000),
-          };
-        } catch {
-          return null;
-        }
-      });
-      const clusters: Cluster[] = [];
-      const used = new Set<number>();
-      for (let i = 0; i < acts.length; i++) {
-        if (used.has(i)) continue;
-        const di = decoded[i];
-        if (!di) continue;
-        let count = 1;
-        for (let j = i + 1; j < acts.length; j++) {
-          if (used.has(j)) continue;
-          const dj = decoded[j];
-          if (!dj || di.distBucket !== dj.distBucket) continue;
-          const startClose =
-            Math.abs(di.start[0] - dj.start[0]) < 0.005 &&
-            Math.abs(di.start[1] - dj.start[1]) < 0.005;
-          const endClose =
-            Math.abs(di.end[0] - dj.end[0]) < 0.005 &&
-            Math.abs(di.end[1] - dj.end[1]) < 0.005;
-          if (startClose && endClose) {
-            used.add(j);
-            count++;
-          }
-        }
-        used.add(i);
-        clusters.push({
-          representative: acts[i],
-          count,
-          color: getColor(acts[i]),
-        });
-      }
       setClusteredTracks(clusters);
       setClustering(false);
     }, 0);
@@ -769,7 +724,14 @@ export function TracksPage({
                         onClick={() => handleSelectTrack(a)}
                       />
                       {count > 1 && (
-                        <span className="pointer-events-none absolute right-1 bottom-1 rounded bg-[var(--color-bg)]/80 px-1 py-0.5 text-[9px] leading-none font-bold text-[var(--color-muted)]">
+                        <span
+                          className="pointer-events-none absolute right-1 bottom-1 rounded bg-[var(--color-bg)]/90 px-1 py-0.5 text-[9px] leading-none font-bold text-[var(--color-muted)]"
+                          title={
+                            locale === 'zh'
+                              ? `相似路线共完成 ${count} 次（包含当前记录）`
+                              : `${count} activities on this similar route (including this one)`
+                          }
+                        >
                           ×{count}
                         </span>
                       )}
@@ -781,6 +743,18 @@ export function TracksPage({
             {/* Legend + sort */}
             {!clustering && clusteredTracks.length > 0 && (
               <div className="mt-4 flex flex-wrap items-center gap-4 border-t border-[var(--color-border)] pt-3 text-xs text-[var(--color-muted)]">
+                <span
+                  className="w-full text-[10px] sm:w-auto"
+                  title={
+                    locale === 'zh'
+                      ? '按运动类型、距离、起终点和完整路线形状判断'
+                      : 'Compared by sport, distance, endpoints, and full route shape'
+                  }
+                >
+                  {locale === 'zh'
+                    ? '×N = 相似路线完成次数'
+                    : '×N = times on a similar route'}
+                </span>
                 {PRIMARY_SPORTS.filter(
                   (sport) =>
                     hasSport(sport.type) &&
